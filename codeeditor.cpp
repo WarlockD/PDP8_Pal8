@@ -7,6 +7,7 @@
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
+    assemblyArea = new AssemblyArea(this);
     highlighter = new Pal8_Highlighter(document());
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
@@ -36,12 +37,7 @@ int CodeEditor::lineNumberAreaWidth()
 
 int CodeEditor::assemblyAreaWidth()
 {
-    int digits = 1;
-    int max = qMax(1000000000000000, blockCount()); // set width of for asembly code
-    while (max >= 10) {
-        max /= 10;
-        ++digits;
-    }
+    int digits = 20;
 
     int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
 
@@ -50,13 +46,23 @@ int CodeEditor::assemblyAreaWidth()
 
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
 {
-    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
+    setViewportMargins(lineNumberAreaWidth(), 0, assemblyAreaWidth(), 0);
 }
 
 void CodeEditor::updateAssemblyAreaWidth(int /* newBlockCount */)
 {
-    setViewportMargins(0, 0, assemblyAreaWidth(), 0);
+    setViewportMargins(lineNumberAreaWidth(), 0, assemblyAreaWidth(), 0);
 }
+void CodeEditor::updateAssemblyArea(const QRect &rect, int dy){
+    if (dy)
+        assemblyArea->scroll(0, dy);
+    else
+        assemblyArea->update(0, rect.y(), assemblyArea->width(), rect.height());
+
+    if (rect.contains(viewport()->rect()))
+        updateAssemblyAreaWidth(0);
+}
+
 
 void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 {
@@ -110,12 +116,13 @@ void CodeEditor::highlightCurrentLine()
      int bottom = top + (int) blockBoundingRect(block).height();
 
      while (block.isValid() && top <= event->rect().bottom()) {
-         block.userData()
          if (block.isVisible() && bottom >= event->rect().top()) {
+             /* do stuff
              QString number = QString::number(blockNumber + 1);
              painter.setPen(Qt::black);
              painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
                               Qt::AlignRight, number);
+                              */
          }
 
          block = block.next();

@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     codeeditor.cpp \
-    pal8_highlighter.cpp
+    pal8_highlighter.cpp \
+    qpal8.cpp
 
 HEADERS  += mainwindow.h \
     codeeditor.h \
-    pal8_highlighter.h
+    pal8_highlighter.h \
+    qpal8.h
 
 FORMS    += mainwindow.ui

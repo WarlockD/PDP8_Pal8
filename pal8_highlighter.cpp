@@ -54,6 +54,28 @@ Pal8_Highlighter::Pal8_Highlighter(QTextDocument *parent)
 
 void Pal8_Highlighter::highlightBlock(const QString &text)
 {
+    QChar c;
+    QString word;
+    QString temp;
+    int startIndex, endIndex;
+    int value;
+    enum class State { Start, Keyword, Number, Operator,Assign };
+    State state = State::Start;
+    for(int pos = 0; pos < text.length();pos++) {
+        c = text[pos];
+        switch(state) {
+        case State::Start:
+            startIndex = pos;
+            if(c.isLetter()) state = State::Keyword;
+            if(c.isDigit()) state = State::Number;
+            if(c == '=') state = State::Assign;
+
+
+        }
+
+
+    }
+    return;
     foreach (const HighlightingRule &rule, highlightingRules) {
         QRegExp expression(rule.pattern);
         int index = expression.indexIn(text);
@@ -65,7 +87,7 @@ void Pal8_Highlighter::highlightBlock(const QString &text)
     }
     setCurrentBlockState(0);
 
-    int startIndex = 0;
+    startIndex = 0;
     if (previousBlockState() != 1)
         startIndex = commentStartExpression.indexIn(text);
 

@@ -28,7 +28,7 @@ private slots:
     void updateAssemblyAreaWidth(int newBlockCount);
     void highlightCurrentLine();
     void updateLineNumberArea(const QRect &, int);
-    void updateAssemblyAreaArea(const QRect &, int);
+    void updateAssemblyArea(const QRect &, int);
 private:
     QWidget *lineNumberArea;
     QWidget *assemblyArea;
