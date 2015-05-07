@@ -19,7 +19,6 @@ enum class Pal8_LineInfo : int { Empty = 0, Code, EndCode };
 class Pal8_Highlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
-    QHash<QString,Symbol*> symtab;
 public:
     Pal8_Highlighter(QTextDocument *parent = 0);
 
@@ -27,7 +26,7 @@ protected:
     void highlightBlock(const QString &text) Q_DECL_OVERRIDE;
 
 private:
-
+    QPal8_Parser _parser;
     struct HighlightingRule
     {
         QRegExp pattern;

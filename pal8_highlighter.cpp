@@ -61,6 +61,21 @@ void Pal8_Highlighter::highlightBlock(const QString &text)
     int value;
     enum class State { Start, Keyword, Number, Operator,Assign };
     State state = State::Start;
+    Tokens tokens = _parser.parseLine(text,false);
+    for(Token t : tokens) {
+        switch(t.kind()) {
+        case Kind::Comment:
+            setFormat(t.pos(),t.len(),singleLineCommentFormat);
+            break;
+        case Kind::Ident:
+            setFormat(t.pos(),t.len(),functionFormat);
+            break;
+        case Kind::Error:
+            setFormat(t.pos(),t.len(),multiLineCommentFormat);
+            break;
+    }
+    }
+        return;
     for(int pos = 0; pos < text.length();pos++) {
         c = text[pos];
         switch(state) {
