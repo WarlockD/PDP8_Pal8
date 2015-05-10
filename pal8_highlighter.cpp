@@ -1,5 +1,4 @@
 #include "pal8_highlighter.h"
-#include <QDebug>
 
 Pal8_Highlighter::Pal8_Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
@@ -55,8 +54,15 @@ Pal8_Highlighter::Pal8_Highlighter(QTextDocument *parent)
 
 void Pal8_Highlighter::highlightBlock(const QString &text)
 {
-    TokenLine tline(text,0);
-    for(Token t : tline.tokens()) {
+    QChar c;
+    QString word;
+    QString temp;
+    int startIndex, endIndex;
+    int value;
+    enum class State { Start, Keyword, Number, Operator,Assign };
+    State state = State::Start;
+    Tokens tokens = _parser.parseLine(text,false);
+    for(Token t : tokens) {
         switch(t.kind()) {
         case Kind::Comment:
             setFormat(t.pos(),t.len(),singleLineCommentFormat);
@@ -68,5 +74,49 @@ void Pal8_Highlighter::highlightBlock(const QString &text)
             setFormat(t.pos(),t.len(),multiLineCommentFormat);
             break;
     }
+    }
+        return;
+    for(int pos = 0; pos < text.length();pos++) {
+        c = text[pos];
+        switch(state) {
+        case State::Start:
+            startIndex = pos;
+            if(c.isLetter()) state = State::Keyword;
+            if(c.isDigit()) state = State::Number;
+            if(c == '=') state = State::Assign;
+
+
+        }
+
+
+    }
+    return;
+    foreach (const HighlightingRule &rule, highlightingRules) {
+        QRegExp expression(rule.pattern);
+        int index = expression.indexIn(text);
+        while (index >= 0) {
+            int length = expression.matchedLength();
+            setFormat(index, length, rule.format);
+            index = expression.indexIn(text, index + length);
+        }
+    }
+    setCurrentBlockState(0);
+
+    startIndex = 0;
+    if (previousBlockState() != 1)
+        startIndex = commentStartExpression.indexIn(text);
+
+    while (startIndex >= 0) {
+        int endIndex = commentEndExpression.indexIn(text, startIndex);
+        int commentLength;
+        if (endIndex == -1) {
+            setCurrentBlockState(1);
+            commentLength = text.length() - startIndex;
+        } else {
+            commentLength = endIndex - startIndex
+                            + commentEndExpression.matchedLength();
+        }
+        setFormat(startIndex, commentLength, multiLineCommentFormat);
+        startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
     }
 }
